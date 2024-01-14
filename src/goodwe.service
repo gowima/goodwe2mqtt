@@ -1,0 +1,23 @@
+# copy this file to /lib/systemd/system/goodwe.service
+#
+# > systemctl daemon-reload 
+# > systemctl --now enable goodwe.service
+#
+[Unit]
+Read and publish to MQTT the configuration, settings and sensor values of Goodwe inverter.
+After=multi-user.target
+
+[Service]
+Type=simple
+Restart=always
+User=pi
+
+ExecStartPre=/bin/sleep 10
+ExecStart=/home/pi/goodwe/goodwe.sh
+WorkingDirectory=/home/pi/goodwe/
+
+StandardOutput=append:/var/log/goodwe.log
+StandardError=append:/var/log/goodwe.log
+
+[Install]
+WantedBy=multi-user.target
