@@ -6,11 +6,11 @@
 
  Files:
  
- - goodwe2mqtt.py
+ - goodwe2mqtt.py     The SCRIPT.
  - goodwe_config.json Configuration parameters for mqtt and GoodWe.
  - goodwe.sh          Shell script to set the python environment and run goodwe2mqtt.
- - goodwe.service     Configuration of a systemctl service running goodwe2mqtt in background.
+ - goodwe.service     Configuration of a systemctl service running goodwe2mqtt in background (Raspian, Debian).
  - mqtt_wrapper.py    Provides the class mqtt_wrapper for convenience with the paho.mqtt api.
  - graceful_killer    Handle Signal handler to stop/kill goodwe2mqtt "softly".
 
-Tested with GoodWe GW29K9-ET.
+Developed for and tested with GoodWe GW29K9-ET.
