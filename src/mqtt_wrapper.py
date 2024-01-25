@@ -5,19 +5,20 @@ Created on Thu Nov 30 17:03:03 2023
 @author: Martin
 """
 import time
+import logging
 import json
 import paho.mqtt.client as mqtt
 
+logger = logging.getLogger(__name__)
+    
+def ftime():
+    return time.strftime("%y-%m-%d %H:%M:%S +0000", time.gmtime())
 
 # -- MQTT Wrapper -------------------------------------------------------------
 class mqtt_wrapper:
     '''
     '''
-    _debug = False      # defaults to no debug print out
     _topic = "mqtt"
-
-    def debug_mode(debug: bool):
-        mqtt_wrapper._debug = debug
 
     def set_topic(topic: str):
         mqtt_wrapper._topic = topic
@@ -35,23 +36,25 @@ class mqtt_wrapper:
         rc : int
             return code when connecting to mqtt
         """
+        # TODO: exception handling on error
+        client.on_connect_rc = rc
         if rc==0:
             client.connected_flag = True
-            print("MQTT: connected")
         else:
             print("MQTT: connection FAILED with return code = ", rc)
             if rc == 1:
-                print("incorrect protocol version")
+                logger.error("MQTT connect: Incorrect protocol version")
             elif rc == 2:
-                print("invalid client identifier")
+                logger.error("MQTT connect: Invalid client identifier")
             elif rc == 3:
-                print("server unavailable")
+                logger.error("MQTT connect: Server unavailable")
             elif rc == 4:
-                print("bad username or password")
+                logger.error("MQTT connect: Bad username or password")
             elif rc == 5:
-                print("not authorised")
+                logger.error("MQTT connect: Not authorised")
             else:
-                print("Unknown return code")
+                logger.error("MQTT connect: Unknown return code")
+
 
     def __init__(self, broker, port, topic_prefix=""):
         """
@@ -69,7 +72,9 @@ class mqtt_wrapper:
             DESCRIPTION. The default is "".
 
         """
+
         mqtt.Client.connected_flag = False # create flag in mqtt class
+        mqtt.Client.on_connect_rc = 0      # create variable for return code
 
         # Establish connection to MQTT broker
         self.client = mqtt.Client(transport="tcp",
@@ -82,15 +87,19 @@ class mqtt_wrapper:
         self.client.loop_start()
         self.client.connect(broker, port)
 
+        # TODO loop forever? What if connection fails?
         while not self.client.connected_flag:   # set by call on_connect func
-            print("MQTT: waiting for connection")
+            logger.info(f"Waiting for connection to mqtt broker, rc = {self.client.on_connect_rc}")
             time.sleep(1)
         time.sleep(5)
 
         # mqtt client should now be up
+        logger.info(f"Connected to mqtt broker at {broker}")
         self.pub(self.topic,
             json.dumps({
                 "system": "MQTT connected",
+                "address": str(broker),
+                "time": ftime(),
                 "timestamp": time.time()
             }), retain=True)
 
@@ -98,8 +107,6 @@ class mqtt_wrapper:
         """
 
         Publish a message to mqtt.
-        Prints to stdout in case of not succeeding.
-        Echos message to stdout if mqtt_wrapper._debug is True.
 
         Parameters
         ----------
@@ -110,29 +117,28 @@ class mqtt_wrapper:
         qos : int, optional
             quality of service. The default is 0.
         retain : bool, optional
-            retain topic if set to True. The default is False. 
-            
+            retain topic if set to True. The default is False.
+
             See mqtt documentation for quos and retain.
 
         Returns
         -------
         None.
-        
+
         """
         res = self.client.publish(topic, message, qos=qos, retain=retain)
         status = res[0]
         if not status == 0:
-            print(f"MQTT: Failed to send message to topic {topic}")
-
-        if mqtt_wrapper._debug:
-            print(str(topic))
-            print('   ', str(message))
+            logger.warning(f"MQTT: Failed to send message to topic {topic}")
+            logger.debug('   ' + str(message))
 
     def close(self):
         self.pub(self.topic,
                  json.dumps({
                      "remark": "MQTT connection closing now",
+                     "time": ftime(),
                      "timestamp": time.time(),
                      }), retain=True)
         self.client.loop_stop()
         self.client.disconnect()
+        logger.info("MQTT connection closed")

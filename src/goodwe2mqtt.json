@@ -1,5 +1,13 @@
 {
-    "mqtt": {
+    "DOCUMENTATION": {
+		"PURPOSE": "Definition of configuration parameters for the godwe2mqtt.py script.",
+		"SECTIONS": {
+			"mqtt": "Connection parameters to a mqtt broker for the mqtt_wrapper module.",
+			"goodwe": "Connection parameters to inverter, parameter for pushs to mqtt broker and filters for sensors and settings.",
+			"logging": "Definition of logging formats and handlers ..."
+		}
+	},
+	"mqtt": {
         "broker": "192.168.21.11",
         "port": 1883,
         "qos": 1,
@@ -12,17 +20,22 @@
         "timeout": 1,
         "retries": 3,
         "topic_prefix": "Strom/GoodWe/",
+        "state": {
+            "topic": "state",
+            "retain": true,
+            "qos": 1
+        },
         "config": {
             "topic": "config",
             "retain": true,
             "qos": 1,
-            "interval": 600
+            "interval": 3600
         },
         "setting": {
             "topic": "setting",
             "retain": true,
             "qos": 1,
-            "interval": 600
+            "interval": 3600
         },
         "sensor": {
             "retain": false,
@@ -40,6 +53,9 @@
             "GRID": {
                 "topic": "sensor/GRID/"
             },
+            "UPS": {
+                "topic": "sensor/UPS/"
+            },
             "whitelist": {
                 "igrid": "current",
                 "igrid2": "current",
@@ -50,6 +66,7 @@
                 "e_load_total": "energy",
                 "e_total_exp": "energy",
                 "e_total_imp": "energy",
+                "house_consumption": "energy",
                 "fgrid": "frequency",
                 "fgrid2": "frequency",
                 "fgrid3": "frequency",
@@ -62,13 +79,17 @@
                 "pgrid3": "power",
                 "total_inverter_power": "power",
                 "safety_country_label": "state",
-                "temperature": "state",
-                "temperature_air": "state",
-                "temperature_module": "state",
+                "temperature": "temperature",
+                "temperature_air": "temperature",
+                "temperature_module": "temperature",
                 "vgrid": "voltage",
                 "vgrid2": "voltage",
                 "vgrid3": "voltage",
+                "battery_bms": "state",
+                "battery_index": "state",
                 "battery_mode_label": "state",
+                "battery_status": "state",
+                "battery2_status": "state",
                 "meter_current1": "current",
                 "meter_current2": "current",
                 "meter_current3": "current",
@@ -79,38 +100,39 @@
                 "active_power1": "power",
                 "active_power2": "power",
                 "active_power3": "power",
+                "apparent_power": "power",
                 "meter_active_power_total": "power",
                 "meter_active_power1": "power",
                 "meter_active_power2": "power",
                 "meter_active_power3": "power",
-                "apparent_power": "power",
                 "meter_apparent_power_total": "power",
+                "meter_reactive_power_total": "power",
                 "reactive_power": "power",
                 "reactive_power_total": "power",
-                "meter_reactive_power_total": "power",
+                "grid_in_out_label": "state",
                 "meter_voltage1": "voltage",
                 "meter_voltage2": "voltage",
                 "meter_voltage3": "voltage",
+                "imppt1": "current",
+                "imppt2": "current",
+                "imppt3": "current",
                 "ipv1": "current",
                 "ipv2": "current",
                 "ipv3": "current",
                 "ipv4": "current",
                 "ipv5": "current",
                 "ipv6": "current",
-                "imppt1": "current",
-                "imppt2": "current",
-                "imppt3": "current",
                 "e_day": "energy",
                 "e_total": "energy",
                 "h_total": "energy",
+                "pmppt1": "power",
+                "pmppt2": "power",
+                "pmppt3": "power",
                 "ppv": "power",
                 "ppv_total": "power",
                 "ppv1": "power",
                 "ppv2": "power",
                 "ppv3": "power",
-                "pmppt1": "power",
-                "pmppt2": "power",
-                "pmppt3": "power",
                 "grid_mode_label": "state",
                 "pv1_mode_label": "state",
                 "pv2_mode_label": "state",
@@ -121,14 +143,17 @@
                 "vpv4": "voltage",
                 "vpv5": "voltage",
                 "vpv6": "voltage",
-                "bus_voltage": "state",
+                "load_mode1": "state",
+                "load_mode2": "state",
+                "load_mode3": "state",
+                "ups_load": "state",
                 "diagnose_result_label": "state",
-                "error_codes": "state",
                 "errors": "state",
+                "error_codes": "state",
                 "operation_mode": "state",
+                "timestamp": "state",
                 "warning_code": "state",
-                "work_mode_label": "state",
-                "timestamp": "state"
+                "work_mode_label": "state"
             }
         },
         "blacklist": [
@@ -140,5 +165,51 @@
             "eco_mode_4_switch",
             "peak_shaving_mode"
         ]
-    }
+    },
+    "logging": {
+        "version": 1,
+        "disable_existing_loggers": false,
+        "formatters": {
+            "default": {
+                "style": "{",
+                "format": "{asctime} {levelname}: {name}: {message}",
+                "datefmt": "%Y-%m-%d %H:%M:%S"
+            },
+            "short": {
+                "style": "{",
+                "format": "{levelname}: {message}"
+            }
+        },
+        "handlers": {
+            "stdout": {
+                "level": "INFO",
+                "class": "logging.StreamHandler",
+                "stream": "ext://sys.stdout",
+                "formatter": "default"
+            },
+            "debuglog": {
+                "level": "DEBUG",
+                "class": "logging.FileHandler",
+                "filename": "./goodwe2mqtt-debug.log",
+                "mode": "w",
+                "formatter": "default"
+            }
+        },
+        "root": {
+            "level": "DEBUG",
+            "handlers": ["stdout"]
+        }
+    },
+	"alternative logging root for debugging": {
+		"level": "INFO",
+		"handlers": ["stdout"]
+	},
+	"this logging handler does not work in user mode because of access right violations: varlog": {
+		"level": "INFO",
+		"class": "logging.handlers.RotatingFileHandler",
+		"filename": "/var/log/goodwe-devel.log",
+		"maxBytes": 10240,
+		"backupCount": 5,
+		"formatter": "default"
+	}
 }
