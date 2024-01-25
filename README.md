@@ -7,7 +7,7 @@
  Files:
  
  - goodwe2mqtt.py     The SCRIPT.
- - goodwe_config.json Configuration parameters for mqtt and GoodWe.
+ - goodwe2mqtt.json   Configuration parameters for mqtt and GoodWe and logging.
  - goodwe.sh          Shell script to set the python environment and run goodwe2mqtt.
  - goodwe.service     Configuration of a systemctl service running goodwe2mqtt in background (Raspian, Debian).
  - mqtt_wrapper.py    Provides the class mqtt_wrapper for convenience with the paho.mqtt api.
