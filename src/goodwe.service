@@ -3,7 +3,8 @@
 # > systemctl daemon-reload 
 # > systemctl --now enable goodwe.service
 #
-# Purpose: Read and publish to MQTT the configuration, settings and sensor values of Goodwe inverter.
+# Purpose: Read and publish to MQTT the configuration, settings 
+#          and sensor values of Goodwe inverter.
 #
 [Unit]
 After=multi-user.target

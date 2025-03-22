@@ -2,7 +2,7 @@
 """
 Created on Thu Nov 30 17:03:03 2023
 
-@author: Martin
+@author: gowima
 """
 import time
 import logging
@@ -10,9 +10,11 @@ import json
 import paho.mqtt.client as mqtt
 
 logger = logging.getLogger(__name__)
-    
+
+
 def ftime():
     return time.strftime("%y-%m-%d %H:%M:%S +0000", time.gmtime())
+
 
 # -- MQTT Wrapper -------------------------------------------------------------
 class mqtt_wrapper:
@@ -20,9 +22,11 @@ class mqtt_wrapper:
     '''
     _topic = "mqtt"
 
+    @classmethod
     def set_topic(topic: str):
         mqtt_wrapper._topic = topic
 
+    @staticmethod
     def on_connect(client, userdata, flags, rc):
         """
         Call back funtion for the connection status of a mqtt.Client.
@@ -38,10 +42,10 @@ class mqtt_wrapper:
         """
         # TODO: exception handling on error
         client.on_connect_rc = rc
-        if rc==0:
+        if rc == 0:
             client.connected_flag = True
         else:
-            print("MQTT: connection FAILED with return code = ", rc)
+            logger.error(f"MQTT: connection FAILED with return code = {rc}")
             if rc == 1:
                 logger.error("MQTT connect: Incorrect protocol version")
             elif rc == 2:
@@ -54,7 +58,6 @@ class mqtt_wrapper:
                 logger.error("MQTT connect: Not authorised")
             else:
                 logger.error("MQTT connect: Unknown return code")
-
 
     def __init__(self, broker, port, topic_prefix=""):
         """
@@ -73,8 +76,8 @@ class mqtt_wrapper:
 
         """
 
-        mqtt.Client.connected_flag = False # create flag in mqtt class
-        mqtt.Client.on_connect_rc = 0      # create variable for return code
+        mqtt.Client.connected_flag = False  # create flag in mqtt class
+        mqtt.Client.on_connect_rc = 0       # create variable for return code
 
         # Establish connection to MQTT broker
         self.client = mqtt.Client(transport="tcp",
@@ -96,16 +99,15 @@ class mqtt_wrapper:
         # mqtt client should now be up
         logger.info(f"Connected to mqtt broker at {broker}")
         self.pub(self.topic,
-            json.dumps({
-                "system": "MQTT connected",
-                "address": str(broker),
-                "time": ftime(),
-                "timestamp": time.time()
-            }), retain=True)
+                 json.dumps({"system": "MQTT connected",
+                             "address": str(broker),
+                             "time": ftime(),
+                             "timestamp": time.time()
+                             }),
+                 retain=True)
 
     def pub(self, topic, message, qos=0, retain=False):
         """
-
         Publish a message to mqtt.
 
         Parameters
@@ -141,4 +143,6 @@ class mqtt_wrapper:
                      }), retain=True)
         self.client.loop_stop()
         self.client.disconnect()
+        self.client = None
+        self.topic = ""
         logger.info("MQTT connection closed")

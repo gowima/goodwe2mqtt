@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Found on the net.
+Found in the net.
 
 If GracefulKiller.kill_now is True, then a signal has been catched.
 How to use e.g.:
@@ -11,9 +11,11 @@ How to use e.g.:
 """
 import signal
 
+
 # -- signal handling ----------------------------------------------------------
 class GracefulKiller:
     kill_now = False
+
     def __init__(self):
         # catch these signals and set kill_now to True
         signal.signal(signal.SIGINT, self.exit_gracefully)

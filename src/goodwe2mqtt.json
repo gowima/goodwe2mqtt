@@ -1,25 +1,32 @@
 {
+    "VERSION": 20250312,
+
     "DOCUMENTATION": {
-		"PURPOSE": "Definition of configuration parameters for the godwe2mqtt.py script.",
+		"PURPOSE": "Configuration parameters for the godwe2mqtt.py script.",
 		"SECTIONS": {
-			"mqtt": "Connection parameters to a mqtt broker for the mqtt_wrapper module.",
-			"goodwe": "Connection parameters to inverter, parameter for pushs to mqtt broker and filters for sensors and settings.",
+			"mqtt": "Connection parameters to a mqtt broker (s.a. mqtt_wrapper.py module).",
+			"goodwe_1": "Connection parameters to inverter",
+			"goodwe_2": "Parameters for pushs to mqtt broker",
+			"goodwe_3": "Parameters for HomeAssistant device discovery",
+			"goodwe_4": "Filters for sensors and settings.",
 			"logging": "Definition of logging formats and handlers ..."
 		}
 	},
 	"mqtt": {
-        "broker": "192.168.21.11",
+        "broker": "192.168.11.230",
         "port": 1883,
         "qos": 1,
-        "topic_prefix": "Strom/GoodWe/"
+        "topic_prefix": "goodwe/"
     },
     "goodwe": {
-        "ip_address": "10.3.141.10",
+        "ip_address": "192.168.11.180",
+        "port": 502,
         "family": "ET",
-        "com_addr": null,
+        "comm_addr": null,
         "timeout": 1,
         "retries": 3,
-        "topic_prefix": "Strom/GoodWe/",
+        "topic_prefix": "goodwe/",
+
         "state": {
             "topic": "state",
             "retain": true,
@@ -31,140 +38,99 @@
             "qos": 1,
             "interval": 3600
         },
-        "setting": {
-            "topic": "setting",
+        "settings": {
+            "topic": "settings",
             "retain": true,
             "qos": 1,
-            "interval": 3600
+            "interval": 3600,
+            "blacklist": []
         },
-        "sensor": {
+
+        "HA_comment": "next 2 dictionaries go into HA Device Discovery",
+        "HA_device": {
+            "name": "Converter",
+            "model": "GW29.9K-ET Hybridwechselrichter",
+            "identifiers": ["GW29.9K-ET"],
+            "manufacturer": "Goodwe"
+        },
+        "HA_origin": {
+            "name": "goodwe2mqtt"
+        },
+
+        "sensors": {
             "retain": false,
             "qos": 0,
             "interval": 15,
-            "PV": {
-                "topic": "sensor/PV/"
-            },
-            "AC": {
-                "topic": "sensor/AC/"
-            },
-            "BAT": {
-                "topic": "sensor/BAT/"
-            },
-            "GRID": {
-                "topic": "sensor/GRID/"
-            },
-            "UPS": {
-                "topic": "sensor/UPS/"
-            },
+            "PV": {"topic": "sensors/PV/"},
+            "AC": {"topic": "sensors/AC/"},
+            "BAT": {"topic": "sensors/BAT/"},
+            "GRID": {"topic": "sensors/GRID/"},
+            "UPS": {"topic": "sensors/UPS/"},
+            "ANY": {"topic": "sensors/ANY/"},
+
             "whitelist": {
-                "igrid": "current",
-                "igrid2": "current",
-                "igrid3": "current",
-                "e_day_exp": "energy",
-                "e_day_imp": "energy",
-                "e_load_day": "energy",
-                "e_load_total": "energy",
-                "e_total_exp": "energy",
-                "e_total_imp": "energy",
-                "house_consumption": "energy",
-                "fgrid": "frequency",
-                "fgrid2": "frequency",
-                "fgrid3": "frequency",
-                "load_p1": "power",
-                "load_p2": "power",
-                "load_p3": "power",
-                "load_ptotal": "power",
-                "pgrid": "power",
-                "pgrid2": "power",
-                "pgrid3": "power",
-                "total_inverter_power": "power",
-                "safety_country_label": "state",
-                "temperature": "temperature",
-                "temperature_air": "temperature",
-                "temperature_module": "temperature",
-                "vgrid": "voltage",
-                "vgrid2": "voltage",
-                "vgrid3": "voltage",
-                "battery_bms": "state",
-                "battery_index": "state",
-                "battery_mode_label": "state",
-                "battery_status": "state",
-                "battery2_status": "state",
-                "meter_current1": "current",
-                "meter_current2": "current",
-                "meter_current3": "current",
-                "meter_e_total_exp": "energy",
-                "meter_e_total_imp": "energy",
-                "active_power": "power",
-                "active_power_total": "power",
-                "active_power1": "power",
-                "active_power2": "power",
-                "active_power3": "power",
-                "apparent_power": "power",
-                "meter_active_power_total": "power",
-                "meter_active_power1": "power",
-                "meter_active_power2": "power",
-                "meter_active_power3": "power",
-                "meter_apparent_power_total": "power",
-                "meter_reactive_power_total": "power",
-                "reactive_power": "power",
-                "reactive_power_total": "power",
-                "grid_in_out_label": "state",
-                "meter_voltage1": "voltage",
-                "meter_voltage2": "voltage",
-                "meter_voltage3": "voltage",
-                "imppt1": "current",
-                "imppt2": "current",
-                "imppt3": "current",
-                "ipv1": "current",
-                "ipv2": "current",
-                "ipv3": "current",
-                "ipv4": "current",
-                "ipv5": "current",
-                "ipv6": "current",
                 "e_day": "energy",
                 "e_total": "energy",
+                "e_day_exp": "energy",
+                "e_total_exp": "energy",
+                "e_day_imp": "energy",
+                "e_total_imp": "energy",
+                "e_load_day": "energy",
+                "e_load_total": "energy",
+                "meter_e_total_exp": "energy",
+                "meter_e_total_imp": "energy",
+                "e_bat_charge_day": "energy",
+                "e_bat_charge_total": "energy",
+                "e_bat_discharge_day": "energy",
+                "e_bat_discharge_total": "energy",
+
                 "h_total": "energy",
-                "pmppt1": "power",
-                "pmppt2": "power",
-                "pmppt3": "power",
+
                 "ppv": "power",
-                "ppv_total": "power",
                 "ppv1": "power",
                 "ppv2": "power",
                 "ppv3": "power",
-                "grid_mode_label": "state",
-                "pv1_mode_label": "state",
-                "pv2_mode_label": "state",
-                "pv3_mode_label": "state",
+                "active_power": "power",
+                "active_power_total": "power",
+                "meter_active_power_total": "power",
+                "pbattery1": "power",
+                "house_consumption": "power",
+                "load_ptotal": "power",
+                "total_inverter_power": "power",
+
+				"imppt1": "current",
+				"imppt2": "current",
+				"imppt3": "current",
+
                 "vpv1": "voltage",
-                "vpv2": "voltage",
                 "vpv3": "voltage",
-                "vpv4": "voltage",
                 "vpv5": "voltage",
-                "vpv6": "voltage",
-                "load_mode1": "state",
-                "load_mode2": "state",
-                "load_mode3": "state",
-                "ups_load": "state",
+                "battery_max_cell_voltage": "voltage",
+                "battery_min_cell_voltage": "voltage",
+                "battery_max_cell_voltage_id": "state",
+                "battery_min_cell_voltage_id": "state",
+
+                "temperature": "temperature",
+                "temperature_air": "temperature",
+                "battery_temperature": "temperature",
+                "battery_max_cell_temp": "temperature",
+                "battery_min_cell_temp": "temperature",
+                
+				"pv1_mode_label": "state",
+				"pv2_mode_label": "state",
+				"pv3_mode_label": "state",
+                "battery_mode_label": "state",
+                "battery_soc": "state",
+                "battery_soh": "state",
+                "grid_mode_label": "state",
+                "grid_in_out_label": "state",
+
                 "diagnose_result_label": "state",
-                "errors": "state",
                 "error_codes": "state",
-                "operation_mode": "state",
-                "timestamp": "state",
                 "warning_code": "state",
                 "work_mode_label": "state"
             }
-        },
-        "blacklist": [
-            "eco_mode_2",
-            "eco_mode_3",
-            "eco_mode_4",
-            "eco_mode_2_switch",
-            "eco_mode_3_switch",
-            "eco_mode_4_switch",
-            "peak_shaving_mode"
-        ]
+        }
     },
     "logging": {
         "version": 1,
@@ -190,14 +156,14 @@
             "debuglog": {
                 "level": "DEBUG",
                 "class": "logging.FileHandler",
-                "filename": "./goodwe2mqtt-debug.log",
+                "filename": "./goodwe2mqtt.log",
                 "mode": "w",
                 "formatter": "default"
             }
         },
         "root": {
-            "level": "DEBUG",
-            "handlers": ["stdout"]
+            "level": "INFO",
+            "handlers": ["debuglog", "stdout"]
         }
     },
 	"alternative logging root for debugging": {
